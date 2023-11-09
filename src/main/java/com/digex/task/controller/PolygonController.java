@@ -13,7 +13,7 @@ public class PolygonController {
     }
 
     @GetMapping("/polygon")
-    Object getPolygons(@RequestParam(name = "city") String cityName) throws Exception {
-        return polygonService.getOSM_ID(cityName);
+    Object getPolygons(@RequestParam(name = "city") String cityName,@RequestParam(name = "subpart") String subpart) throws Exception {
+        return polygonService.getOSM_ID(cityName,subpart);
     }
 }

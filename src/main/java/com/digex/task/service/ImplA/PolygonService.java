@@ -21,9 +21,9 @@ public class PolygonService implements IPolygonService {
 
 
     @Override
-    public Object getOSM_ID(String cityName) throws Exception {
+    public Object getOSM_ID(String cityName, String subpart) throws Exception {
         int osmID = 0;
-        String templateForObject = restTemplate.getForObject("https://nominatim.openstreetmap.org/search.php?q=" + cityName + "&polygon_geojson=1&format=jsonv2", String.class);
+        String templateForObject = restTemplate.getForObject("https://nominatim.openstreetmap.org/search.php?q=" + subpart + "&polygon_geojson=1&format=jsonv2", String.class);
         // Create an ObjectMapper
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -35,21 +35,12 @@ public class PolygonService implements IPolygonService {
             String searchKey = "osm_id";
             String searchValue = null;
             for (JsonNode node : jsonNodes) {
-                if (node.has(searchKey)) {
-                    searchValue = node.get(searchKey).asText();
-                    osmID=Integer.parseInt(searchValue);
-                    break;
+                if (node.findValue("display_name").toString().contains(cityName)) {
+                    System.out.println("geojson: "+node.findValue("geojson").toString());
+                    Polygon polygon=jsonMapper.fromJson(node.findValue("geojson").toString(), Polygon.class);
+                    polygon.setOsm_id(node.findValue("osm_id").asInt());
+                    return polygon;
                 }
-            }
-
-            if (searchValue != null) {
-                System.out.println("Found key: " + searchKey + ", Value: " + searchValue);
-                String url="https://polygons.openstreetmap.fr/get_geojson.py?id="+osmID+"&params=0.000000-0.001000-0.001000";
-                String result = restTemplate.getForObject(url, String.class);
-                Polygon polygon=jsonMapper.fromJson(result,Polygon.class);
-                return polygon;
-            } else {
-                System.out.println("Key not found.");
             }
 
         } catch (Exception e) {
