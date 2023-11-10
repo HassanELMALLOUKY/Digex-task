@@ -11,7 +11,7 @@ public class JsonMapper {
     }
 
     // Convert JSON to the model
-    public <T> T fromJson(String json, Class<T> valueType) throws Exception {
+    public <T> T fromJson(String json,Class<T> valueType) throws Exception {
         return objectMapper.readValue(json, valueType);
     }
 
